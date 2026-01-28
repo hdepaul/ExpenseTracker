@@ -1,7 +1,7 @@
-# CD Pipeline - Deploys to Azure when pushing to main
-# Only runs after CI passes
+# CD Pipeline - Build and push Docker image
+# Azure deployment is disabled - uncomment when ready
 
-name: CD - Deploy to Azure
+name: CD - Build and Push
 
 on:
   push:
@@ -9,12 +9,10 @@ on:
   workflow_dispatch:  # Allows manual trigger from GitHub UI
 
 env:
-  AZURE_WEBAPP_NAME: expense-tracker-api    # Change this to your Azure App Service name
-  AZURE_RESOURCE_GROUP: expense-tracker-rg  # Change this to your Resource Group
   IMAGE_NAME: expense-tracker-api
 
 jobs:
-  # First job: Build and Test (same as CI)
+  # First job: Build and Test
   build-and-test:
     name: Build and Test
     runs-on: ubuntu-latest
@@ -37,17 +35,16 @@ jobs:
     - name: Run tests
       run: dotnet test --configuration Release --no-build --verbosity normal
 
-  # Second job: Build Docker image and push to registry
+  # Second job: Build Docker image and push to GitHub Container Registry
   build-and-push-image:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    needs: build-and-test  # Only runs if tests pass
+    needs: build-and-test
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # Option 1: Push to GitHub Container Registry (free)
     - name: Log in to GitHub Container Registry
       uses: docker/login-action@v3
       with:
@@ -55,7 +52,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build and push Docker image to GHCR
+    - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
         context: .
@@ -65,47 +62,21 @@ jobs:
           ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
           ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-    # Option 2: Push to Azure Container Registry (uncomment if using ACR)
-    # - name: Log in to Azure Container Registry
-    #   uses: docker/login-action@v3
-    #   with:
-    #     registry: ${{ secrets.ACR_LOGIN_SERVER }}
-    #     username: ${{ secrets.ACR_USERNAME }}
-    #     password: ${{ secrets.ACR_PASSWORD }}
-    #
-    # - name: Build and push to ACR
-    #   uses: docker/build-push-action@v5
-    #   with:
-    #     context: .
-    #     file: ./src/ExpenseTracker.API/Dockerfile
-    #     push: true
-    #     tags: |
-    #       ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
-    #       ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-
-  # Third job: Deploy to Azure App Service (optional)
-  deploy-to-azure:
-    name: Deploy to Azure
-    runs-on: ubuntu-latest
-    needs: build-and-push-image
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-
-    steps:
-    - name: Log in to Azure
-      uses: azure/login@v2
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v3
-      with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        images: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-
-    # Alternative: Deploy using Azure CLI
-    # - name: Deploy with Azure CLI
-    #   run: |
-    #     az webapp config container set \
-    #       --name ${{ env.AZURE_WEBAPP_NAME }} \
-    #       --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-    #       --docker-custom-image-name ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+  # AZURE DEPLOYMENT - Uncomment when ready
+  # deploy-to-azure:
+  #   name: Deploy to Azure
+  #   runs-on: ubuntu-latest
+  #   needs: build-and-push-image
+  #   if: github.ref == 'refs/heads/main'
+  #
+  #   steps:
+  #   - name: Log in to Azure
+  #     uses: azure/login@v2
+  #     with:
+  #       creds: ${{ secrets.AZURE_CREDENTIALS }}
+  #
+  #   - name: Deploy to Azure Web App
+  #     uses: azure/webapps-deploy@v3
+  #     with:
+  #       app-name: expense-tracker-api
+  #       images: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
