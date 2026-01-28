@@ -1,5 +1,8 @@
 # Expense Tracker API
 
+[![CI - Build and Test](https://github.com/YOUR_USERNAME/ExpenseTracker/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/ExpenseTracker/actions/workflows/ci.yml)
+[![CD - Deploy to Azure](https://github.com/YOUR_USERNAME/ExpenseTracker/actions/workflows/cd.yml/badge.svg)](https://github.com/YOUR_USERNAME/ExpenseTracker/actions/workflows/cd.yml)
+
 A RESTful API for personal expense tracking built with .NET 10, following Clean Architecture principles and best practices.
 
 ## Architecture
@@ -23,6 +26,7 @@ src/
 - **FluentValidation** - Declarative request validation
 - **Entity Framework Core 10** - Code-first database with SQL Server
 - **Docker** - Containerized deployment with docker-compose
+- **GitHub Actions** - CI/CD pipelines for automated testing and deployment
 
 ## Features
 
@@ -34,6 +38,7 @@ src/
 - Global exception handling
 - Request validation pipeline
 - Request/Response logging
+- **36 unit tests** with xUnit, Moq, and FluentAssertions
 
 ## Getting Started
 
@@ -68,6 +73,12 @@ dotnet run
 
 3. Access the API documentation at `https://localhost:5001/scalar/v1`
 
+### Running Tests
+
+```bash
+dotnet test
+```
+
 ### Database Migrations
 
 Create a new migration:
@@ -80,6 +91,56 @@ Update database:
 ```bash
 dotnet ef database update --startup-project ../ExpenseTracker.API
 ```
+
+## CI/CD Pipeline
+
+This project uses **GitHub Actions** for continuous integration and deployment.
+
+### Pipeline Overview
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   git push  │ ──► │    Build    │ ──► │    Test     │ ──► │   Deploy    │
+│             │     │             │     │  (36 tests) │     │  to Azure   │
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+```
+
+### Workflows
+
+| Workflow | Trigger | What it does |
+|----------|---------|--------------|
+| **CI** | Push, Pull Request | Build + Run Tests |
+| **CD** | Push to main | Build + Test + Deploy to Azure |
+
+### Setting up Azure Deployment
+
+1. Create Azure resources:
+   ```bash
+   # Create Resource Group
+   az group create --name expense-tracker-rg --location eastus
+
+   # Create App Service Plan
+   az appservice plan create --name expense-tracker-plan \
+     --resource-group expense-tracker-rg --sku B1 --is-linux
+
+   # Create Web App
+   az webapp create --name expense-tracker-api \
+     --resource-group expense-tracker-rg \
+     --plan expense-tracker-plan \
+     --deployment-container-image-name ghcr.io/YOUR_USERNAME/expense-tracker-api:latest
+   ```
+
+2. Create Azure credentials for GitHub:
+   ```bash
+   az ad sp create-for-rbac --name "expense-tracker-github" \
+     --role contributor \
+     --scopes /subscriptions/{subscription-id}/resourceGroups/expense-tracker-rg \
+     --sdk-auth
+   ```
+
+3. Add the output as a GitHub Secret named `AZURE_CREDENTIALS`
+
+4. Update the workflow file with your Azure Web App name
 
 ## API Endpoints
 
@@ -110,30 +171,39 @@ dotnet ef database update --startup-project ../ExpenseTracker.API
 
 ```
 ExpenseTracker/
+├── .github/
+│   └── workflows/
+│       ├── ci.yml              # CI pipeline (build + test)
+│       └── cd.yml              # CD pipeline (deploy to Azure)
 ├── src/
 │   ├── ExpenseTracker.Domain/
-│   │   ├── Common/           # BaseEntity, Value Objects
-│   │   ├── Entities/         # User, Expense, Category
-│   │   ├── Enums/            # ExpenseType
-│   │   └── Exceptions/       # Domain exceptions
+│   │   ├── Common/             # BaseEntity, Value Objects
+│   │   ├── Entities/           # User, Expense, Category
+│   │   ├── Enums/              # ExpenseType
+│   │   └── Exceptions/         # Domain exceptions
 │   │
 │   ├── ExpenseTracker.Application/
 │   │   ├── Common/
-│   │   │   ├── Behaviors/    # Validation, Logging pipelines
-│   │   │   ├── Interfaces/   # IDbContext, IJwtService
-│   │   │   └── Models/       # Result, PagedResult
+│   │   │   ├── Behaviors/      # Validation, Logging pipelines
+│   │   │   ├── Interfaces/     # IDbContext, IJwtService
+│   │   │   └── Models/         # Result, PagedResult
 │   │   └── Features/
-│   │       ├── Auth/         # Register, Login commands
-│   │       ├── Expenses/     # CRUD commands/queries
-│   │       └── Categories/   # Category queries
+│   │       ├── Auth/           # Register, Login commands
+│   │       ├── Expenses/       # CRUD commands/queries
+│   │       └── Categories/     # Category queries
 │   │
 │   ├── ExpenseTracker.Infrastructure/
-│   │   ├── Data/             # DbContext, Configurations
-│   │   └── Services/         # JWT, PasswordHasher
+│   │   ├── Data/               # DbContext, Configurations, Migrations
+│   │   └── Services/           # JWT, PasswordHasher
 │   │
 │   └── ExpenseTracker.API/
-│       ├── Controllers/      # API endpoints
-│       └── Middleware/       # Exception handling
+│       ├── Controllers/        # API endpoints
+│       └── Middleware/         # Exception handling
+│
+├── tests/
+│   └── ExpenseTracker.Application.Tests/
+│       ├── Domain/             # Entity tests
+│       └── Features/           # Handler and Validator tests
 │
 ├── docker-compose.yml
 ├── Dockerfile
