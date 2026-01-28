@@ -1,7 +1,7 @@
 # Expense Tracker API
 
-[![CI - Build and Test](https://github.com/YOUR_USERNAME/ExpenseTracker/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/ExpenseTracker/actions/workflows/ci.yml)
-[![CD - Deploy to Azure](https://github.com/YOUR_USERNAME/ExpenseTracker/actions/workflows/cd.yml/badge.svg)](https://github.com/YOUR_USERNAME/ExpenseTracker/actions/workflows/cd.yml)
+[![CI - Build and Test](https://github.com/hdepaul/ExpenseTracker/actions/workflows/ci.yml/badge.svg)](https://github.com/hdepaul/ExpenseTracker/actions/workflows/ci.yml)
+[![CD - Deploy to Azure](https://github.com/hdepaul/ExpenseTracker/actions/workflows/cd.yml/badge.svg)](https://github.com/hdepaul/ExpenseTracker/actions/workflows/cd.yml)
 
 A RESTful API for personal expense tracking built with .NET 10, following Clean Architecture principles and best practices.
 
@@ -127,7 +127,7 @@ This project uses **GitHub Actions** for continuous integration and deployment.
    az webapp create --name expense-tracker-api \
      --resource-group expense-tracker-rg \
      --plan expense-tracker-plan \
-     --deployment-container-image-name ghcr.io/YOUR_USERNAME/expense-tracker-api:latest
+     --deployment-container-image-name ghcr.io/hdepaul/expense-tracker-api:latest
    ```
 
 2. Create Azure credentials for GitHub:
