@@ -57,6 +57,12 @@ public class ApplicationDbContextInitializer
             Category.Create("Shopping", "Clothing, electronics, personal items", "🛒", "#FFEAA7"),
             Category.Create("Healthcare", "Medical, dental, pharmacy", "💊", "#DDA0DD"),
             Category.Create("Utilities", "Electric, water, internet, phone", "💡", "#98D8C8"),
+            Category.Create("Taxes", "Income tax, property tax, government fees", "🏛️", "#9B59B6"),
+            Category.Create("Services", "Internet, phone, professional services", "🔧", "#3498DB"),
+            Category.Create("Subscriptions", "Streaming, software, memberships", "📱", "#E74C3C"),
+            Category.Create("Credit Card", "Credit card payments and fees", "💳", "#1ABC9C"),
+            Category.Create("Nafta", "Combustible y gastos de vehículo", "⛽", "#F39C12"),
+            Category.Create("Comida", "Almuerzo, delivery, snacks", "🍕", "#E67E22"),
             Category.Create("Other", "Miscellaneous expenses", "📦", "#B8B8B8")
         };
 

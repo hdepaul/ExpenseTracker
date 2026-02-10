@@ -1,12 +1,11 @@
 using ExpenseTracker.Application.Common.Interfaces;
-using ExpenseTracker.Application.Common.Models;
 using ExpenseTracker.Domain.Exceptions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExpenseTracker.Application.Features.Expenses.Queries.GetExpenses;
 
-public class GetExpensesQueryHandler : IRequestHandler<GetExpensesQuery, PagedResult<ExpenseDto>>
+public class GetExpensesQueryHandler : IRequestHandler<GetExpensesQuery, ExpenseListResult>
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUserService;
@@ -17,7 +16,7 @@ public class GetExpensesQueryHandler : IRequestHandler<GetExpensesQuery, PagedRe
         _currentUserService = currentUserService;
     }
 
-    public async Task<PagedResult<ExpenseDto>> Handle(GetExpensesQuery request, CancellationToken cancellationToken)
+    public async Task<ExpenseListResult> Handle(GetExpensesQuery request, CancellationToken cancellationToken)
     {
         var userId = _currentUserService.UserId
             ?? throw new UnauthorizedException("User must be authenticated");
@@ -45,6 +44,21 @@ public class GetExpensesQueryHandler : IRequestHandler<GetExpensesQuery, PagedRe
         // Get total count
         var totalCount = await query.CountAsync(cancellationToken);
 
+        // Get total amount across all filtered expenses
+        var totalAmount = await query.SumAsync(e => e.Amount, cancellationToken);
+
+        // Get summary by category
+        // First get the filtered expenses with category names, then group in memory
+        var expensesWithCategory = await query
+            .Select(e => new { e.Amount, e.Category.Name })
+            .ToListAsync(cancellationToken);
+
+        var byCategory = expensesWithCategory
+            .GroupBy(x => x.Name)
+            .Select(g => new CategorySummary(g.Key, g.Sum(x => x.Amount)))
+            .OrderByDescending(c => c.Amount)
+            .ToList();
+
         // Get paged items
         var items = await query
             .Include(e => e.Category)
@@ -64,6 +78,12 @@ public class GetExpensesQueryHandler : IRequestHandler<GetExpensesQuery, PagedRe
                 e.UpdatedAt))
             .ToListAsync(cancellationToken);
 
-        return new PagedResult<ExpenseDto>(items, totalCount, request.PageNumber, request.PageSize);
+        return new ExpenseListResult(
+            items,
+            totalCount,
+            request.PageNumber,
+            request.PageSize,
+            totalAmount,
+            byCategory);
     }
 }

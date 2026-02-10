@@ -1,0 +1,3 @@
+az group delete --name expense-tracker-rg --yes
+
+.\azure-container-apps-setup.ps1

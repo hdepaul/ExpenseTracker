@@ -1,6 +1,8 @@
 @ExpenseTracker.API_HostAddress = http://localhost:5189
 
-GET {{ExpenseTracker.API_HostAddress}}/weatherforecast/
+GET {{ExpenseTracker.API_HostAddress}}/GetCategories/
 Accept: application/json
 
 ###
+
+POST {{ExpenseTracker.API_HostAddress}}/Register
