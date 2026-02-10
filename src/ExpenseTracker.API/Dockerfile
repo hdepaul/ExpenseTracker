@@ -27,9 +27,10 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-# Create non-root user for security
-RUN adduser --disabled-password --gecos "" appuser && chown -R appuser /app
-USER appuser
-
+# Copy published files
 COPY --from=publish /app/publish .
+
+# Use the built-in non-root user (available in .NET 8+)
+USER $APP_UID
+
 ENTRYPOINT ["dotnet", "ExpenseTracker.API.dll"]
