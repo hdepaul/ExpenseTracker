@@ -11,6 +11,11 @@ on:
 env:
   IMAGE_NAME: expense-tracker-api
 
+# Permissions needed for GHCR
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   # First job: Build and Test
   build-and-test:
