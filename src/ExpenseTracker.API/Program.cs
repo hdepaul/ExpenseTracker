@@ -19,10 +19,21 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins(
+                "http://localhost:4200",
+                "https://localhost:4200"
+              )
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
+    });
+
+    // Para producción - permite cualquier origen (ajustar en prod real)
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
     });
 });
 
@@ -64,7 +75,8 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAngular");
+// En desarrollo usa política restrictiva, en producción permite todo (ajustar para prod real)
+app.UseCors(app.Environment.IsDevelopment() ? "AllowAngular" : "AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
