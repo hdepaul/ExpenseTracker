@@ -4,8 +4,8 @@ cd C:\Development\ExpenseTracker
 dotnet clean --configuration Debug
 dotnet clean --configuration Release
 
-# Setear connection string
-$env:ConnectionStrings__DefaultConnection="Server=tcp:expense-tracker-sql-hernan.database.windows.net,1433;Database=ExpenseTrackerDb;User ID=sqladmin;Password=Kakaroto2030!;Encrypt=True;TrustServerCertificate=False;"
+# Setear connection string - REEMPLAZAR CON TUS CREDENCIALES
+$env:ConnectionStrings__DefaultConnection="Server=tcp:YOUR_SERVER.database.windows.net,1433;Database=YOUR_DATABASE;User ID=YOUR_USER;Password=YOUR_PASSWORD;Encrypt=True;TrustServerCertificate=False;"
 
 # Aplicar migraciones con Release
 dotnet ef database update --project src/ExpenseTracker.Infrastructure --startup-project src/ExpenseTracker.API --configuration Release
