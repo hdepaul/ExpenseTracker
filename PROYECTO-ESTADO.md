@@ -13,9 +13,10 @@ Aplicación de control de gastos con:
 
 | Recurso | URL |
 |---------|-----|
-| **API** | https://expense-tracker-api.kindmoss-4320f913.eastus.azurecontainerapps.io |
-| **GitHub Repo** | github.com/hdepaul/ExpenseTracker |
-| **GitHub Packages** | github.com/hdepaul?tab=packages |
+| **Frontend (Angular)** | https://delightful-sky-08733d10f.6.azurestaticapps.net |
+| **Backend (API)** | https://expense-tracker-api.kindmoss-4320f913.eastus.azurecontainerapps.io |
+| **GitHub Backend** | github.com/hdepaul/ExpenseTracker |
+| **GitHub Frontend** | github.com/hdepaul/expense-tracker-app |
 
 ---
 
@@ -209,9 +210,8 @@ C:\Development\
 
 ## Pendiente / Ideas Futuras
 
-- [ ] Deploy del frontend Angular a Azure Static Web Apps
+- [x] Deploy del frontend Angular a Azure Static Web Apps ✅
 - [ ] Dominio personalizado
-- [ ] HTTPS con certificado propio
 - [ ] Refresh tokens (JWT)
 - [ ] Tests unitarios frontend
 - [ ] PWA (Progressive Web App)
