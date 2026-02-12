@@ -78,7 +78,7 @@ secrets.json
 *.key
 
 # Entity Framework
-migrations/
+# migrations/  # Las migraciones SÍ deben subirse al repo
 
 # Docker
 .docker/
