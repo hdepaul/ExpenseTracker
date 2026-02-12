@@ -82,3 +82,7 @@ secrets.json
 
 # Docker
 .docker/
+
+# Scripts con credenciales
+scripts/update-password.ps1
+scripts/change-sql-password.txt
