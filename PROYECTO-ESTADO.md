@@ -13,7 +13,9 @@ Aplicación de control de gastos con:
 
 | Recurso | URL |
 |---------|-----|
-| **Frontend (Angular)** | https://delightful-sky-08733d10f.6.azurestaticapps.net |
+| **Frontend (Dominio)** | https://enquegasto.com |
+| **Frontend (www)** | https://www.enquegasto.com |
+| **Frontend (Azure)** | https://delightful-sky-08733d10f.6.azurestaticapps.net |
 | **Backend (API)** | https://expense-tracker-api.kindmoss-4320f913.eastus.azurecontainerapps.io |
 | **GitHub Backend** | github.com/hdepaul/ExpenseTracker |
 | **GitHub Frontend** | github.com/hdepaul/expense-tracker-app |
@@ -62,6 +64,8 @@ Aplicación de control de gastos con:
 - [x] EF Core Migrations en el repo
 - [x] Secret AZURE_CREDENTIALS configurado en GitHub
 - [x] Deploy automático en cada push a main
+- [x] Dominio custom enquegasto.com + www (Cloudflare DNS → Azure Static Web Apps)
+- [x] SSL/TLS automático (Azure managed certificate)
 
 ---
 
@@ -109,6 +113,7 @@ Aplicación de control de gastos con:
 | SQL Database | ExpenseTrackerDb |
 | Container App | expense-tracker-api |
 | Container Environment | expense-tracker-env |
+| Dominio | enquegasto.com (Cloudflare DNS) |
 
 ---
 
@@ -228,7 +233,7 @@ C:\Development\
 - [x] PWA básico (manifest, meta tags) ✅
 - [x] Favicon personalizado ✅
 - [x] SPA routing en Azure ✅
-- [ ] Dominio personalizado
+- [x] Dominio personalizado (enquegasto.com + www) via Cloudflare DNS ✅
 - [x] **AI Agent** - Agregar gastos por lenguaje natural ("Agregá $50 de nafta de hoy") ✅
 - [ ] **AI Resumen** - Pedir resumen por chat ("¿Cuánto gasté en comida este mes?")
 - [ ] Refresh tokens (JWT)
