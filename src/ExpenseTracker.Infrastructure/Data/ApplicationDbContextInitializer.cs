@@ -50,7 +50,7 @@ public class ApplicationDbContextInitializer
 
         var defaultCategories = new[]
         {
-            Category.Create("Food & Dining", "Restaurants, groceries, coffee shops", "🍔", "#FF6B6B"),
+            Category.Create("Restaurants & Bars", "Eating out, delivery, bars, coffee shops", "🍽️", "#FF6B6B"),
             Category.Create("Transportation", "Gas, public transit, rideshare", "🚗", "#4ECDC4"),
             Category.Create("Housing", "Rent, mortgage, utilities", "🏠", "#45B7D1"),
             Category.Create("Entertainment", "Movies, games, streaming services", "🎬", "#96CEB4"),
@@ -62,7 +62,7 @@ public class ApplicationDbContextInitializer
             Category.Create("Subscriptions", "Streaming, software, memberships", "📱", "#E74C3C"),
             Category.Create("Credit Card", "Credit card payments and fees", "💳", "#1ABC9C"),
             Category.Create("Nafta", "Combustible y gastos de vehículo", "⛽", "#F39C12"),
-            Category.Create("Comida", "Almuerzo, delivery, snacks", "🍕", "#E67E22"),
+            Category.Create("Groceries", "Supermarket, food supplies", "🛒", "#E67E22"),
             Category.Create("Other", "Miscellaneous expenses", "📦", "#B8B8B8")
         };
 
