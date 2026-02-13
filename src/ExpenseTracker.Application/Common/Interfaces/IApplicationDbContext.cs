@@ -9,6 +9,7 @@ public interface IApplicationDbContext
     DbSet<Expense> Expenses { get; }
     DbSet<Category> Categories { get; }
     DbSet<AIUsageLog> AIUsageLogs { get; }
+    DbSet<Budget> Budgets { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
