@@ -22,20 +22,21 @@ public class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, List<AdminUse
         var dailyLimit = _configuration.GetValue<int>("Claude:DailyMessageLimit", 30);
 
         var users = await _context.Users
-            .Select(u => new AdminUserDto(
-                u.Id,
-                u.Email,
-                u.FirstName,
-                u.LastName,
-                u.CreatedAt,
-                _context.AIUsageLogs
-                    .Where(log => log.UserId == u.Id && log.Date == today)
-                    .Select(log => log.MessageCount)
-                    .FirstOrDefault(),
-                dailyLimit))
             .OrderByDescending(u => u.CreatedAt)
             .ToListAsync(cancellationToken);
 
-        return users;
+        var todayUsage = await _context.AIUsageLogs
+            .Where(log => log.Date == today)
+            .ToDictionaryAsync(log => log.UserId, log => log.MessageCount, cancellationToken);
+
+        return users.Select(u => new AdminUserDto(
+            u.Id,
+            u.Email,
+            u.FirstName,
+            u.LastName,
+            u.CreatedAt,
+            todayUsage.GetValueOrDefault(u.Id, 0),
+            dailyLimit))
+        .ToList();
     }
 }
