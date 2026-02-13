@@ -38,6 +38,7 @@ Aplicación de control de gastos con:
 - [x] **AI Agent** - Gastos por lenguaje natural con Claude Haiku 3.5 (Agentic Tool Use)
 - [x] Rate limiting de mensajes AI por usuario/día (configurable, default 30)
 - [x] Multi-turno: Claude pregunta si falta info (categoría, monto, etc.)
+- [x] **AI Resumen** - Tool `query_expenses` para consultar gastos por fecha/categoría, Claude genera resumen en lenguaje natural
 
 #### Frontend (Angular)
 - [x] Login / Register
@@ -53,6 +54,15 @@ Aplicación de control de gastos con:
 - [x] Interceptor que maneja token expirado (redirige a login)
 - [x] Environments configurados (dev/prod)
 - [x] **Mini-chat AI** en lista de gastos (burbujas, loading animado, auto-refresh)
+- [x] **Input por voz** - Web Speech API (micrófono), auto-envía transcripción
+- [x] **Text-to-Speech** - Botón parlante en respuestas de Claude (opcional)
+- [x] **Chat UX mejorado** - Mensaje de bienvenida + chips de ejemplo tocables
+- [x] **Landing page** - Hero, features, how-it-works, CTA para usuarios no logueados
+- [x] **Toggle password** - Ojito show/hide en login y register
+- [x] **Navegación por mes** - Flechitas en vez de dropdown, click en mes para "Todo el tiempo"
+- [x] **Íconos de acción** - Edit/Delete con emojis compactos en vez de botones de texto
+- [x] **PWA icons** - Todos los tamaños (72-512px) generados desde favicon SVG
+- [x] Logout redirige a landing page
 
 #### DevOps / Azure
 - [x] Dockerfile para la API
@@ -235,13 +245,18 @@ C:\Development\
 - [x] SPA routing en Azure ✅
 - [x] Dominio personalizado (enquegasto.com + www) via Cloudflare DNS ✅
 - [x] **AI Agent** - Agregar gastos por lenguaje natural ("Agregá $50 de nafta de hoy") ✅
-- [ ] **AI Resumen** - Pedir resumen por chat ("¿Cuánto gasté en comida este mes?")
+### Próximas features (en orden de prioridad)
+- [ ] **WhatsApp Bot** - Registrar gastos por WhatsApp con Twilio (mismo endpoint `/api/ai/chat`)
+- [ ] **Presupuestos por categoría** - Límite mensual + barra de progreso + alerta al 80%
+- [ ] **Foto del ticket** - OCR con Claude Vision para extraer monto/comercio
+- [ ] **Gastos recurrentes** - Auto-registro mensual, Claude detecta patrones
+
+### Backlog técnico
 - [ ] Refresh tokens (JWT)
 - [ ] Tests unitarios frontend
 - [ ] Service Worker (offline cache)
 - [ ] Notificaciones push
 - [ ] Export a Excel/PDF
-- [ ] Íconos PWA (72-512px)
 
 ---
 
