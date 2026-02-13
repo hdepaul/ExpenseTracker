@@ -13,6 +13,8 @@ public interface IClaudeAgentService
     Task<ClaudeAgentResult> SendToolResultAsync(
         List<ChatMessage> history,
         string toolUseId,
+        string toolName,
+        string toolInput,
         string toolResult,
         IEnumerable<CategoryInfo> categories,
         CancellationToken ct);

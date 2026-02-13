@@ -42,6 +42,8 @@ public class ClaudeAgentService : IClaudeAgentService
     public async Task<ClaudeAgentResult> SendToolResultAsync(
         List<ChatMessage> history,
         string toolUseId,
+        string toolName,
+        string toolInput,
         string toolResult,
         IEnumerable<CategoryInfo> categories,
         CancellationToken ct)
@@ -64,8 +66,8 @@ public class ClaudeAgentService : IClaudeAgentService
                 {
                     type = "tool_use",
                     id = toolUseId,
-                    name = "create_expense",
-                    input = JsonSerializer.Deserialize<JsonElement>(toolResult)
+                    name = toolName,
+                    input = JsonSerializer.Deserialize<JsonElement>(toolInput)
                 }
             }
         });
@@ -145,7 +147,9 @@ public class ClaudeAgentService : IClaudeAgentService
         var categoryList = string.Join("\n", categories.Select(c => $"- {c.Id}: {c.Name}"));
 
         return $"""
-            Sos un asistente de gastos. El usuario te dice qué gastó y vos lo registrás usando la tool create_expense.
+            Sos un asistente de gastos. Tenés dos capacidades:
+            1. Registrar gastos: el usuario te dice qué gastó y vos lo registrás usando la tool create_expense.
+            2. Consultar gastos: el usuario pregunta cuánto gastó y vos consultás usando la tool query_expenses.
 
             Fecha de hoy: {today}
 
@@ -160,6 +164,9 @@ public class ClaudeAgentService : IClaudeAgentService
             - Sé breve y amigable en las confirmaciones
             - Usá la tool create_expense para crear gastos, nunca respondas solo con texto si tenés toda la info
             - El campo description debe ser corto y descriptivo (ej: "Nafta", "Almuerzo", "Netflix")
+            - Para consultas de gastos, usá query_expenses. Cuando recibas los datos, hacé un resumen claro y amigable.
+            - Para "esta semana" usá lunes a domingo de la semana actual
+            - Para "este mes" usá el primer y último día del mes actual
             """;
     }
 
@@ -183,6 +190,22 @@ public class ClaudeAgentService : IClaudeAgentService
                         ["notes"] = new { type = "string", description = "Optional additional notes" }
                     },
                     required = new[] { "amount", "description", "date", "categoryId" }
+                }
+            },
+            new
+            {
+                name = "query_expenses",
+                description = "Queries the user's expenses for a date range, optionally filtered by category. Returns totals and breakdown by category.",
+                input_schema = new
+                {
+                    type = "object",
+                    properties = new Dictionary<string, object>
+                    {
+                        ["dateFrom"] = new { type = "string", description = "Start date in YYYY-MM-DD format" },
+                        ["dateTo"] = new { type = "string", description = "End date in YYYY-MM-DD format" },
+                        ["categoryId"] = new { type = "string", description = "Optional: UUID of category to filter by" }
+                    },
+                    required = new[] { "dateFrom", "dateTo" }
                 }
             }
         ];

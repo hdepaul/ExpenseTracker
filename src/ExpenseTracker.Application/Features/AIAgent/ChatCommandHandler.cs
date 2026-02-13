@@ -77,10 +77,21 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
         await _context.SaveChangesAsync(cancellationToken);
 
         // Handle tool use
-        if (result.StopReason == "tool_use" && result.ToolName == "create_expense" && result.ToolInput.HasValue)
+        if (result.StopReason == "tool_use" && result.ToolInput.HasValue)
         {
-            return await HandleCreateExpense(
-                result, userId, history, request.Message, categories, cancellationToken);
+            var fullHistory = new List<ChatMessage>(history) { new("user", request.Message) };
+
+            if (result.ToolName == "create_expense")
+            {
+                return await HandleCreateExpense(
+                    result, userId, fullHistory, categories, cancellationToken);
+            }
+
+            if (result.ToolName == "query_expenses")
+            {
+                return await HandleQueryExpenses(
+                    result, userId, fullHistory, categories, cancellationToken);
+            }
         }
 
         // Text response (question/clarification)
@@ -90,8 +101,7 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
     private async Task<ChatResponse> HandleCreateExpense(
         ClaudeAgentResult result,
         Guid userId,
-        List<ChatMessage> history,
-        string userMessage,
+        List<ChatMessage> fullHistory,
         List<CategoryInfo> categories,
         CancellationToken cancellationToken)
     {
@@ -130,11 +140,7 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
             expense.Id, userId, amount, description);
 
         // Send tool result back to Claude for confirmation message
-        var fullHistory = new List<ChatMessage>(history)
-        {
-            new("user", userMessage)
-        };
-
+        var toolInputJson = result.ToolInput!.Value.GetRawText();
         var toolResultJson = JsonSerializer.Serialize(new
         {
             success = true,
@@ -145,11 +151,84 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
         });
 
         var confirmResult = await _claudeAgent.SendToolResultAsync(
-            fullHistory, result.ToolUseId!, toolResultJson, categories, cancellationToken);
+            fullHistory, result.ToolUseId!, "create_expense", toolInputJson, toolResultJson,
+            categories, cancellationToken);
 
         var confirmMessage = confirmResult.TextContent
             ?? $"Done! Added ${amount} for {description}.";
 
         return new ChatResponse("expense_created", confirmMessage, expense.Id);
+    }
+
+    private async Task<ChatResponse> HandleQueryExpenses(
+        ClaudeAgentResult result,
+        Guid userId,
+        List<ChatMessage> fullHistory,
+        List<CategoryInfo> categories,
+        CancellationToken cancellationToken)
+    {
+        var input = result.ToolInput!.Value;
+
+        var dateFromStr = input.GetProperty("dateFrom").GetString()!;
+        var dateToStr = input.GetProperty("dateTo").GetString()!;
+        var categoryIdStr = input.TryGetProperty("categoryId", out var catEl) ? catEl.GetString() : null;
+
+        if (!DateTime.TryParse(dateFromStr, out var dateFrom))
+            dateFrom = DateTime.UtcNow.AddDays(-7);
+        if (!DateTime.TryParse(dateToStr, out var dateTo))
+            dateTo = DateTime.UtcNow;
+
+        // Query expenses
+        var query = _context.Expenses
+            .Where(e => e.UserId == userId && e.Date >= dateFrom && e.Date <= dateTo);
+
+        if (!string.IsNullOrEmpty(categoryIdStr) && Guid.TryParse(categoryIdStr, out var categoryId))
+        {
+            query = query.Where(e => e.CategoryId == categoryId);
+        }
+
+        var expenses = await query
+            .Include(e => e.Category)
+            .OrderByDescending(e => e.Date)
+            .ToListAsync(cancellationToken);
+
+        var total = expenses.Sum(e => e.Amount);
+        var byCategory = expenses
+            .GroupBy(e => e.Category!.Name)
+            .Select(g => new { category = g.Key, amount = g.Sum(e => e.Amount), count = g.Count() })
+            .OrderByDescending(g => g.amount)
+            .ToList();
+
+        var recentItems = expenses.Take(10).Select(e => new
+        {
+            description = e.Description,
+            amount = e.Amount,
+            date = e.Date.ToString("yyyy-MM-dd"),
+            category = e.Category?.Name
+        }).ToList();
+
+        _logger.LogInformation("AI queried expenses for user {UserId}: {Count} expenses, total {Total}",
+            userId, expenses.Count, total);
+
+        // Send data back to Claude for natural language summary
+        var toolInputJson = result.ToolInput!.Value.GetRawText();
+        var toolResultJson = JsonSerializer.Serialize(new
+        {
+            totalAmount = total,
+            expenseCount = expenses.Count,
+            dateFrom = dateFrom.ToString("yyyy-MM-dd"),
+            dateTo = dateTo.ToString("yyyy-MM-dd"),
+            byCategory,
+            recentItems
+        });
+
+        var summaryResult = await _claudeAgent.SendToolResultAsync(
+            fullHistory, result.ToolUseId!, "query_expenses", toolInputJson, toolResultJson,
+            categories, cancellationToken);
+
+        var summaryMessage = summaryResult.TextContent
+            ?? $"You spent ${total} between {dateFrom:MMM dd} and {dateTo:MMM dd}.";
+
+        return new ChatResponse("message", summaryMessage, null);
     }
 }
