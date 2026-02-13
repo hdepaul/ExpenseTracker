@@ -29,6 +29,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(100);
 
+        builder.Property(u => u.Role)
+            .IsRequired()
+            .HasMaxLength(20)
+            .HasDefaultValue("User");
+
         builder.HasMany(u => u.Expenses)
             .WithOne(e => e.User)
             .HasForeignKey(e => e.UserId)

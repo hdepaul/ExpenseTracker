@@ -38,6 +38,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponse>
             user.Email,
             user.FirstName,
             user.LastName,
-            DateTime.UtcNow.AddHours(1));
+            DateTime.UtcNow.AddHours(1),
+            user.Role);
     }
 }

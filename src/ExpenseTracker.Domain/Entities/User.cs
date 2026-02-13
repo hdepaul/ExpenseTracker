@@ -8,6 +8,7 @@ public class User : BaseEntity
     public string PasswordHash { get; private set; } = null!;
     public string FirstName { get; private set; } = null!;
     public string LastName { get; private set; } = null!;
+    public string Role { get; private set; } = "User";
 
     // Navigation properties
     private readonly List<Expense> _expenses = new();
@@ -31,7 +32,8 @@ public class User : BaseEntity
             Email = email.ToLowerInvariant(),
             PasswordHash = passwordHash,
             FirstName = firstName,
-            LastName = lastName
+            LastName = lastName,
+            Role = "User"
         };
     }
 

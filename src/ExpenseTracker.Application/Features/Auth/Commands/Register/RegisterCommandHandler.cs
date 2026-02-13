@@ -54,6 +54,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
             user.Email,
             user.FirstName,
             user.LastName,
-            DateTime.UtcNow.AddHours(1));
+            DateTime.UtcNow.AddHours(1),
+            user.Role);
     }
 }

@@ -5,7 +5,8 @@ public record AuthResponse(
     string Email,
     string FirstName,
     string LastName,
-    DateTime ExpiresAt);
+    DateTime ExpiresAt,
+    string Role);
 
 public record UserDto(
     Guid Id,
