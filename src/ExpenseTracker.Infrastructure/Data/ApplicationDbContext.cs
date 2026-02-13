@@ -13,6 +13,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<Expense> Expenses => Set<Expense>();
     public DbSet<Category> Categories => Set<Category>();
+    public DbSet<AIUsageLog> AIUsageLogs => Set<AIUsageLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

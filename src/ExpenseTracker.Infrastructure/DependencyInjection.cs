@@ -32,6 +32,13 @@ public static class DependencyInjection
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
 
+        // Claude AI Agent
+        services.AddHttpClient<IClaudeAgentService, ClaudeAgentService>(client =>
+        {
+            client.DefaultRequestHeaders.Add("x-api-key", configuration["Claude:ApiKey"] ?? "");
+            client.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
+        });
+
         // Authentication
         services.AddAuthentication(options =>
         {
