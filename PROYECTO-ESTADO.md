@@ -3,7 +3,7 @@
 ## Resumen
 Aplicación de control de gastos con:
 - **Backend**: .NET 10 (Clean Architecture + CQRS con MediatR)
-- **Frontend**: Angular 19 (Standalone Components + Signals)
+- **Frontend**: Angular 21 (Standalone Components + Signals)
 - **Base de datos**: SQL Server (local) / Azure SQL (producción)
 - **Deploy**: Azure Container Apps + GitHub Actions
 
@@ -33,6 +33,9 @@ Aplicación de control de gastos con:
 - [x] Totales y agrupado por categoría
 - [x] Categorías: Food, Transportation, Housing, Entertainment, Shopping, Healthcare, Utilities, Taxes, Services, Subscriptions, Credit Card, Nafta, Comida, Other
 - [x] CORS configurado para desarrollo y producción
+- [x] **AI Agent** - Gastos por lenguaje natural con Claude Haiku 3.5 (Agentic Tool Use)
+- [x] Rate limiting de mensajes AI por usuario/día (configurable, default 30)
+- [x] Multi-turno: Claude pregunta si falta info (categoría, monto, etc.)
 
 #### Frontend (Angular)
 - [x] Login / Register
@@ -47,6 +50,7 @@ Aplicación de control de gastos con:
 - [x] Responsive/Mobile - Todas las páginas adaptadas
 - [x] Interceptor que maneja token expirado (redirige a login)
 - [x] Environments configurados (dev/prod)
+- [x] **Mini-chat AI** en lista de gastos (burbujas, loading animado, auto-refresh)
 
 #### DevOps / Azure
 - [x] Dockerfile para la API
@@ -164,9 +168,15 @@ C:\Development\
 ├── ExpenseTracker\                    # Backend .NET
 │   ├── src\
 │   │   ├── ExpenseTracker.API\
+│   │   │   └── Controllers\           # Expenses, Auth, AI
 │   │   ├── ExpenseTracker.Application\
+│   │   │   ├── Features\Expenses\     # CRUD gastos
+│   │   │   ├── Features\AIAgent\      # Chat con Claude (Agentic Tool Use)
+│   │   │   └── Common\Interfaces\     # IClaudeAgentService, etc.
 │   │   ├── ExpenseTracker.Domain\
+│   │   │   └── Entities\              # Expense, Category, User, AIUsageLog
 │   │   └── ExpenseTracker.Infrastructure\
+│   │       ├── Services\              # ClaudeAgentService, JwtService, etc.
 │   │       └── Data\Migrations\       # EF Migrations
 │   ├── scripts\
 │   │   ├── azure-container-apps-setup.ps1
@@ -198,6 +208,10 @@ C:\Development\
 - `Jwt__Issuer` → ExpenseTrackerAPI
 - `Jwt__Audience` → ExpenseTrackerClient
 - `Jwt__ExpirationMinutes` → 480
+- `Claude__ApiKey` → API key de Anthropic
+- `Claude__Model` → claude-haiku-4-5-20251001
+- `Claude__MaxTokens` → 1024
+- `Claude__DailyMessageLimit` → 30
 
 ### Frontend (environments)
 - `environment.ts` → `apiUrl: 'http://localhost:5189/api'`
@@ -211,12 +225,18 @@ C:\Development\
 ## Pendiente / Ideas Futuras
 
 - [x] Deploy del frontend Angular a Azure Static Web Apps ✅
+- [x] PWA básico (manifest, meta tags) ✅
+- [x] Favicon personalizado ✅
+- [x] SPA routing en Azure ✅
 - [ ] Dominio personalizado
+- [x] **AI Agent** - Agregar gastos por lenguaje natural ("Agregá $50 de nafta de hoy") ✅
+- [ ] **AI Resumen** - Pedir resumen por chat ("¿Cuánto gasté en comida este mes?")
 - [ ] Refresh tokens (JWT)
 - [ ] Tests unitarios frontend
-- [ ] PWA (Progressive Web App)
+- [ ] Service Worker (offline cache)
 - [ ] Notificaciones push
 - [ ] Export a Excel/PDF
+- [ ] Íconos PWA (72-512px)
 
 ---
 
