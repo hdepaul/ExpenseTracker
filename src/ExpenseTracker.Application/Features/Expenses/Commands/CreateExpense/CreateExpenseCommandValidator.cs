@@ -19,7 +19,7 @@ public class CreateExpenseCommandValidator : AbstractValidator<CreateExpenseComm
         RuleFor(x => x.Date)
             .NotEmpty()
             .WithMessage("Date is required")
-            .LessThanOrEqualTo(DateTime.UtcNow.AddDays(1))
+            .LessThanOrEqualTo(DateTime.UtcNow.Date)
             .WithMessage("Date cannot be in the future");
 
         RuleFor(x => x.CategoryId)

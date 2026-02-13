@@ -158,6 +158,7 @@ public class ClaudeAgentService : IClaudeAgentService
 
             Reglas:
             - Si el usuario no dice la fecha, usá la fecha de hoy ({today})
+            - NUNCA uses una fecha futura (posterior a {today}). Si el usuario pide una fecha futura, decile que no se pueden cargar gastos a futuro
             - Si no encontrás la categoría exacta, preguntá sugiriendo las más parecidas de la lista
             - Si falta el monto, preguntá
             - Respondé en el mismo idioma que el usuario
