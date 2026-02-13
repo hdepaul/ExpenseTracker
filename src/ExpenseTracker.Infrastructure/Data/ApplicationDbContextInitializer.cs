@@ -50,7 +50,7 @@ public class ApplicationDbContextInitializer
 
         var defaultCategories = new[]
         {
-            Category.Create("Restaurants & Bars", "Eating out, delivery, bars, coffee shops", "🍽️", "#FF6B6B"),
+            Category.Create("Restaurants", "Eating out, delivery, bars, coffee shops", "🍽️", "#FF6B6B"),
             Category.Create("Transportation", "Gas, public transit, rideshare", "🚗", "#4ECDC4"),
             Category.Create("Housing", "Rent, mortgage, utilities", "🏠", "#45B7D1"),
             Category.Create("Entertainment", "Movies, games, streaming services", "🎬", "#96CEB4"),
