@@ -19,7 +19,7 @@ public class CreateExpenseCommandValidatorTests
         var command = new CreateExpenseCommand(
             Amount: 100.50m,
             Description: "Groceries",
-            Date: DateTime.UtcNow,
+            Date: DateTime.UtcNow.Date,
             CategoryId: Guid.NewGuid(),
             Notes: "Weekly shopping"
         );
@@ -42,7 +42,7 @@ public class CreateExpenseCommandValidatorTests
         var command = new CreateExpenseCommand(
             Amount: amount,
             Description: "Test",
-            Date: DateTime.UtcNow,
+            Date: DateTime.UtcNow.Date,
             CategoryId: Guid.NewGuid(),
             Notes: null
         );
@@ -65,7 +65,7 @@ public class CreateExpenseCommandValidatorTests
         var command = new CreateExpenseCommand(
             Amount: 100m,
             Description: description!,
-            Date: DateTime.UtcNow,
+            Date: DateTime.UtcNow.Date,
             CategoryId: Guid.NewGuid(),
             Notes: null
         );
@@ -86,7 +86,7 @@ public class CreateExpenseCommandValidatorTests
         var command = new CreateExpenseCommand(
             Amount: 100m,
             Description: longDescription,
-            Date: DateTime.UtcNow,
+            Date: DateTime.UtcNow.Date,
             CategoryId: Guid.NewGuid(),
             Notes: null
         );
@@ -128,7 +128,7 @@ public class CreateExpenseCommandValidatorTests
         var command = new CreateExpenseCommand(
             Amount: 100m,
             Description: "Test",
-            Date: DateTime.UtcNow,
+            Date: DateTime.UtcNow.Date,
             CategoryId: Guid.Empty,
             Notes: null
         );
@@ -149,7 +149,7 @@ public class CreateExpenseCommandValidatorTests
         var command = new CreateExpenseCommand(
             Amount: 100m,
             Description: "Test",
-            Date: DateTime.UtcNow,
+            Date: DateTime.UtcNow.Date,
             CategoryId: Guid.NewGuid(),
             Notes: longNotes
         );
