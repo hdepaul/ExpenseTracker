@@ -63,6 +63,7 @@ public class ApplicationDbContextInitializer
             Category.Create("Credit Card", "Credit card payments and fees", "💳", "#1ABC9C"),
             Category.Create("Nafta", "Combustible y gastos de vehículo", "⛽", "#F39C12"),
             Category.Create("Groceries", "Supermarket, food supplies", "🛒", "#E67E22"),
+            Category.Create("Gym", "Gym memberships and fitness", "🏋️", "#FF6347"),
             Category.Create("Other", "Miscellaneous expenses", "📦", "#B8B8B8")
         };
 
