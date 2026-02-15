@@ -33,10 +33,11 @@ public class ClaudeAgentService : IClaudeAgentService
         string message,
         List<ChatMessage> history,
         IEnumerable<CategoryInfo> categories,
+        int timezoneOffset,
         CancellationToken ct)
     {
         var messages = BuildMessages(history, message);
-        return await CallClaudeAsync(messages, categories, ct);
+        return await CallClaudeAsync(messages, categories, timezoneOffset, ct);
     }
 
     public async Task<ClaudeAgentResult> SendToolResultAsync(
@@ -46,6 +47,7 @@ public class ClaudeAgentService : IClaudeAgentService
         string toolInput,
         string toolResult,
         IEnumerable<CategoryInfo> categories,
+        int timezoneOffset,
         CancellationToken ct)
     {
         var messages = new List<object>();
@@ -87,7 +89,7 @@ public class ClaudeAgentService : IClaudeAgentService
             }
         });
 
-        return await CallClaudeAsync(messages, categories, ct);
+        return await CallClaudeAsync(messages, categories, timezoneOffset, ct);
     }
 
     private List<object> BuildMessages(List<ChatMessage> history, string newMessage)
@@ -106,12 +108,13 @@ public class ClaudeAgentService : IClaudeAgentService
     private async Task<ClaudeAgentResult> CallClaudeAsync(
         List<object> messages,
         IEnumerable<CategoryInfo> categories,
+        int timezoneOffset,
         CancellationToken ct)
     {
         var model = _configuration["Claude:Model"] ?? "claude-haiku-4-5-20251001";
         var maxTokens = _configuration.GetValue<int>("Claude:MaxTokens", 1024);
 
-        var systemPrompt = BuildSystemPrompt(categories);
+        var systemPrompt = BuildSystemPrompt(categories, timezoneOffset);
         var tools = BuildTools();
 
         var requestBody = new
@@ -141,9 +144,11 @@ public class ClaudeAgentService : IClaudeAgentService
         return ParseResponse(responseBody);
     }
 
-    private string BuildSystemPrompt(IEnumerable<CategoryInfo> categories)
+    private string BuildSystemPrompt(IEnumerable<CategoryInfo> categories, int timezoneOffset)
     {
-        var today = DateTime.UtcNow.ToString("yyyy-MM-dd");
+        // timezoneOffset comes from JS: getTimezoneOffset() returns minutes ahead of UTC (e.g. Argentina UTC-3 = 180)
+        var userLocalNow = DateTimeOffset.UtcNow.AddMinutes(-timezoneOffset);
+        var today = userLocalNow.ToString("yyyy-MM-dd");
         var categoryList = string.Join("\n", categories.Select(c => $"- {c.Id}: {c.Name}"));
 
         return $"""

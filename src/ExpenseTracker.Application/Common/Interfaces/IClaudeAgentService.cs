@@ -8,6 +8,7 @@ public interface IClaudeAgentService
         string message,
         List<ChatMessage> history,
         IEnumerable<CategoryInfo> categories,
+        int timezoneOffset,
         CancellationToken ct);
 
     Task<ClaudeAgentResult> SendToolResultAsync(
@@ -17,6 +18,7 @@ public interface IClaudeAgentService
         string toolInput,
         string toolResult,
         IEnumerable<CategoryInfo> categories,
+        int timezoneOffset,
         CancellationToken ct);
 }
 

@@ -60,9 +60,9 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
             .Select(h => new ChatMessage(h.Role, h.Content))
             .ToList();
 
-        // Call Claude
+        // Call Claude with user's timezone offset
         var result = await _claudeAgent.ProcessAsync(
-            request.Message, history, categories, cancellationToken);
+            request.Message, history, categories, request.TimezoneOffset, cancellationToken);
 
         // Track usage
         if (usageLog == null)
@@ -84,13 +84,13 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
             if (result.ToolName == "create_expense")
             {
                 return await HandleCreateExpense(
-                    result, userId, fullHistory, categories, cancellationToken);
+                    result, userId, fullHistory, categories, request.TimezoneOffset, cancellationToken);
             }
 
             if (result.ToolName == "query_expenses")
             {
                 return await HandleQueryExpenses(
-                    result, userId, fullHistory, categories, cancellationToken);
+                    result, userId, fullHistory, categories, request.TimezoneOffset, cancellationToken);
             }
         }
 
@@ -103,6 +103,7 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
         Guid userId,
         List<ChatMessage> fullHistory,
         List<CategoryInfo> categories,
+        int timezoneOffset,
         CancellationToken cancellationToken)
     {
         var input = result.ToolInput!.Value;
@@ -152,7 +153,7 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
 
         var confirmResult = await _claudeAgent.SendToolResultAsync(
             fullHistory, result.ToolUseId!, "create_expense", toolInputJson, toolResultJson,
-            categories, cancellationToken);
+            categories, timezoneOffset, cancellationToken);
 
         var confirmMessage = confirmResult.TextContent
             ?? $"Done! Added ${amount} for {description}.";
@@ -165,6 +166,7 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
         Guid userId,
         List<ChatMessage> fullHistory,
         List<CategoryInfo> categories,
+        int timezoneOffset,
         CancellationToken cancellationToken)
     {
         var input = result.ToolInput!.Value;
@@ -224,7 +226,7 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, ChatResponse>
 
         var summaryResult = await _claudeAgent.SendToolResultAsync(
             fullHistory, result.ToolUseId!, "query_expenses", toolInputJson, toolResultJson,
-            categories, cancellationToken);
+            categories, timezoneOffset, cancellationToken);
 
         var summaryMessage = summaryResult.TextContent
             ?? $"You spent ${total} between {dateFrom:MMM dd} and {dateTo:MMM dd}.";

@@ -24,10 +24,10 @@ public class AIController : ControllerBase
         [FromBody] ChatRequest request,
         CancellationToken cancellationToken)
     {
-        var command = new ChatCommand(request.Message, request.History);
+        var command = new ChatCommand(request.Message, request.History, request.TimezoneOffset);
         var result = await _mediator.Send(command, cancellationToken);
         return Ok(result);
     }
 }
 
-public record ChatRequest(string Message, List<ChatMessageDto> History);
+public record ChatRequest(string Message, List<ChatMessageDto> History, int TimezoneOffset = 0);
