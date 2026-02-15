@@ -64,6 +64,7 @@ public class ApplicationDbContextInitializer
             Category.Create("Nafta", "Combustible y gastos de vehículo", "⛽", "#F39C12"),
             Category.Create("Groceries", "Supermarket, food supplies", "🛒", "#E67E22"),
             Category.Create("Gym", "Gym memberships and fitness", "🏋️", "#FF6347"),
+            Category.Create("Delivery", "Food delivery services", "🛵", "#FF9F43"),
             Category.Create("Other", "Miscellaneous expenses", "📦", "#B8B8B8")
         };
 
